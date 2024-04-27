@@ -18,7 +18,7 @@ const Navbar = () => {
           <Link to="/contact" className="text-white hover:text-gray-300 ml-4 mx-[20px]">Contact</Link>
         </li>
         <li>
-          {isAuthenticated && (<span className="text-white mx-[20px]">Hello, {user.name}</span>)}
+          {isAuthenticated && (<span className="text-white mx-[20px]">Hello, {user.email}</span>)}
         </li>
         <li>
           {isAuthenticated ? (

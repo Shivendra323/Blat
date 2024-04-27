@@ -1,24 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Import axios for making HTTP requests
+import { useAuth0 } from "@auth0/auth0-react";
 
 const Sports = () => {
   const [isSubscriber, setIsSubscriber] = useState(true);
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([
-    { sender: 'User1', content: 'Hello!' },
-    { sender: 'User2', content: 'Hi there!' },
-    { sender: 'User1', content: 'How are you?' },
-    { sender: 'User2', content: 'I am good, thanks!' },
-  ]);
+  const [messages, setMessages] = useState([]);
+  const { user, loginWithRedirect, isAuthenticated, logout } = useAuth0();
+
+  useEffect(() => {
+    // Fetch messages from the backend when the component mounts
+    fetchMessages();
+  }, []);
+
+  const fetchMessages = async () => {
+    try {
+      const channelId = '180710'; // Assuming channelId is 'sports18'
+      const response = await axios.get(`http://localhost:5000/api/messages?channelId=${channelId}`);
+      console.log(response.data);
+      // Map messages to the required format
+      const formattedMessages = response.data.map(msgArray => ({
+        channelId: msgArray[0],
+        userId: msgArray[1],
+        message: msgArray[2],
+        timestamp: msgArray[3]
+      }));
+      setMessages(formattedMessages);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  };
 
   const handleJoinChannel = () => {
     setIsSubscriber(false);
     console.log("User joined the Sports channel");
   };
 
-  const handleSendMessage = () => {
-    if (message.trim() !== '') {
-      setMessages([...messages, { sender: 'User', content: message }]);
+  const handleSendMessage = async () => {
+    try {
+      const channelId = '180710'; // Replace with actual channelId
+      const userId = user.email; // Replace with actual userId
+      const timestamp = Date.now();
+
+      await axios.post('http://localhost:5000/api/send-message', {
+        channelId,
+        userId,
+        message,
+        timestamp,
+      });
+      await fetchMessages(); // Refresh messages after sending a new message
       setMessage('');
+    } catch (error) {
+      console.error('Error sending message:', error);
     }
   };
 
@@ -33,7 +66,6 @@ const Sports = () => {
       {isSubscriber ? (
         <div className="flex flex-col items-center justify-center h-screen">
           <div>
-            {/* <h1 className="text-3xl font-bold mb-4">Sports</h1> */}
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
               onClick={handleJoinChannel}
@@ -50,17 +82,17 @@ const Sports = () => {
                 <div
                   key={index}
                   className={`flex items-center ${
-                    msg.sender === 'User' ? 'justify-end' : 'justify-start'
+                    msg.userId === user.email ? 'justify-end' : 'justify-start'
                   }`}
                 >
                   <div
                     className={`${
-                      msg.sender === 'User'
+                      msg.userId === user.email
                         ? 'bg-blue-500 text-white rounded-tl-lg rounded-br-lg rounded-bl-lg'
                         : 'bg-white text-gray-800 rounded-tr-lg rounded-br-lg rounded-br-lg'
                     } p-3 max-w-xs break-all`}
                   >
-                    {msg.content}
+                    {msg.message}
                   </div>
                 </div>
               ))}

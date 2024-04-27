@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ganache": "ganache --wallet.seed myCustomSeed"
+    "start": "nodemon index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "web3": "^4.8.0"
+    "cors": "^2.8.5",
+    "ethers": "^6.12.0",
+    "express": "^4.19.2",
+    "web3": "^1.8.2"
   }
 }
