@@ -3,19 +3,44 @@ import axios from 'axios'; // Import axios for making HTTP requests
 import { useAuth0 } from "@auth0/auth0-react";
 
 const Cinema = () => {
-  const [isSubscriber, setIsSubscriber] = useState(true);
+  const [isSubscriber, setIsSubscriber] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const { user, loginWithRedirect, isAuthenticated, logout } = useAuth0();
 
   useEffect(() => {
     // Fetch messages from the backend when the component mounts
+    checkUserSubscription();
     fetchMessages();
   }, []);
 
+  const checkSubscriptionStatus = async (channelId, email) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/getSubscriber?channelId=${channelId}&email=${email}`);
+      // Check if the user is subscribed to the channel
+      if (response.status === 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Error checking subscription status:', error);
+      return false;
+    }
+  };
+
+  const checkUserSubscription = async () => {
+    const channelId = '191301'; // Assuming channelId is based on first film made in india Raja Harishchnadra
+    const email = user.email; // Assuming user.email contains the user's email address
+    
+    const subscribed = await checkSubscriptionStatus(channelId, email);
+    //console.log(subscribed);
+    setIsSubscriber(subscribed);
+  };
+
   const fetchMessages = async () => {
     try {
-      const channelId = '070796'; // Assuming channelId is 'sports18'
+      const channelId = '191301'; // Assuming channelId is 'sports18'
       const response = await axios.get(`http://localhost:5000/api/messages?channelId=${channelId}`);
       console.log(response.data);
       // Map messages to the required format
@@ -31,14 +56,29 @@ const Cinema = () => {
     }
   };
 
-  const handleJoinChannel = () => {
-    setIsSubscriber(false);
-    console.log("User joined the Cinema channel");
+  const handleJoinChannel = async () => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/subscribeChannel', {
+        channelId: '191301', // Replace with the channelId of the Cinema channel
+        email: user.email // Assuming user.email contains the user's email address
+      });
+      
+      // Check if the subscription was successful
+      if (response.status === 201) {
+        setIsSubscriber(true);
+        console.log('User subscribed to the Cinema channel');
+      } else {
+        console.error('Failed to subscribe to the Cinema channel');
+      }
+    } catch (error) {
+      console.error('Error subscribing to the channel:', error);
+    }
   };
+  
 
   const handleSendMessage = async () => {
     try {
-      const channelId = '070796'; // Replace with actual channelId
+      const channelId = '191301'; // Replace with actual channelId
       const userId = user.email; // Replace with actual userId
       const timestamp = Date.now();
 
@@ -63,7 +103,7 @@ const Cinema = () => {
 
   return (
     <>
-      {isSubscriber ? (
+      {!isSubscriber ? (
         <div className="flex flex-col items-center justify-center h-screen">
           <div>
             <button

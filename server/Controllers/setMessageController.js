@@ -1,7 +1,7 @@
 const Web3 = require('web3'); 
 const MyContract = require("../contract/ChannelChat.json"); 
 const contractABI = MyContract.abi; 
-const contractAddress = '0x1e9c67F4E6B057b2e69163BeA43978c21f45cc81'; // Enter your contract address here 
+const contractAddress = '0x0E167e692a63045f655AbAB74796085B6916D1B2'; // Enter your contract address here 
 const rpcEndpoint = 'http://127.0.0.1:8545'; // Enter your RPC server endpoint URL here 
 
 const web3 = new Web3(new Web3.providers.HttpProvider(rpcEndpoint)); 
