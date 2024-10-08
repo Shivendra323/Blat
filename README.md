@@ -93,6 +93,14 @@ Feel free to fork the repository and submit pull requests for any features or bu
 4. Push to the branch (`git push origin feature/YourFeature`)
 5. Open a pull request
 
+## Contact Information
+
+For any queries or further information, please contact:
+
+**Name**: [Shivendra Singh Thakur]  
+**Email**: [Shivendra323@gmail.com]  
+**LinkedIn**: [www.linkedin.com/in/shivendra-singh-thakur-09a36a1b0]
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
